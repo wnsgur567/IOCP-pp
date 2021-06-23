@@ -50,10 +50,11 @@ TCPSocketPtr SocketUtil::CreateTCPSocket()
 	return std::make_shared<TCPSocket>(sock);
 }
 
+// 
 HandlePtr SocketUtil::CreateIOCP(LPTHREAD_START_ROUTINE inWorkThreadPtr)
 {
 	HandlePtr hcpPtr;
-	hcpPtr = std::make_shared<HandlePtr>(
+	hcpPtr = std::make_shared<HANDLE>(
 		CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0));
 	if (*hcpPtr == nullptr)
 		return nullptr;

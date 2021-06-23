@@ -13,45 +13,69 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Core">
+    <Filter Include="NetCore">
       <UniqueIdentifier>{aa8d8d78-e4dc-4f77-ae1a-14141bdcf18f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core_h">
+    <Filter Include="NetCore_h">
       <UniqueIdentifier>{8922028c-849e-4b8e-8415-70fcd54a9db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{370d0d90-8c48-49b3-b48f-588852f31d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core_h">
+      <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Stream.h">
-      <Filter>Core_h</Filter>
-    </ClInclude>
     <ClInclude Include="TCPSocket.h">
-      <Filter>Core_h</Filter>
+      <Filter>NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketAddress.h">
-      <Filter>Core_h</Filter>
+      <Filter>NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketUtil.h">
+      <Filter>NetCore_h</Filter>
+    </ClInclude>
+    <ClInclude Include="CriticalSection.h">
       <Filter>Core_h</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryStream.h">
+      <Filter>NetCore_h</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Stream.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="TCPSocket.cpp">
-      <Filter>Core</Filter>
+      <Filter>NetCore</Filter>
     </ClCompile>
     <ClCompile Include="SocketAddress.cpp">
-      <Filter>Core</Filter>
+      <Filter>NetCore</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SocketUtil.cpp">
+      <Filter>NetCore</Filter>
+    </ClCompile>
+    <ClCompile Include="CriticalSection.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryStream.cpp">
+      <Filter>NetCore</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
