@@ -2,9 +2,20 @@
 
 
 #pragma region Recv (InputStream)
+
+InputMemoryStream::InputMemoryStream(size_t inByteCount)
+	:m_buffer(nullptr),
+	m_isBufferOwner(true),
+	m_head(0),
+	m_capacity(inByteCount)
+{
+	m_buffer = new char[m_capacity];
+	ZeroMemory(m_buffer, m_capacity);
+}
+
 // 외부 버퍼 사용
 // 소유권 x
-InputMemoryStream::InputMemoryStream(char* inBuffer, size_t inByteCount, bool inIsOwner = false)
+InputMemoryStream::InputMemoryStream(char* inBuffer, size_t inByteCount, bool inIsOwner)
 	: m_buffer(inBuffer),
 	m_isBufferOwner(inIsOwner),
 	m_head(0),
@@ -75,8 +86,8 @@ void OutputMemoryStream::ReAllocBuffer(size_t inNewLength)
 	m_capacity = inNewLength;
 }
 
-OutputMemoryStream::OutputMemoryStream()
-	:m_buffer(nullptr), m_head(0), m_capacity(BUFSIZE)
+OutputMemoryStream::OutputMemoryStream(size_t inCapacity)
+	:m_buffer(nullptr), m_head(0), m_capacity(inCapacity)
 {
 	m_buffer = new char[m_capacity];
 }

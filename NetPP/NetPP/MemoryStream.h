@@ -10,7 +10,8 @@ private:
 	size_t m_head;				// 읽기 시작할 현제 head 의 위치
 	size_t m_capacity;			// 최대 용량
 public:
-	InputMemoryStream(char* inBuffer, size_t inByteCount, bool inIsOwner);
+	InputMemoryStream(size_t inByteCount);
+	InputMemoryStream(char* inBuffer, size_t inByteCount, bool inIsOwner = false);
 	InputMemoryStream(const InputMemoryStream& inOther);
 	InputMemoryStream& operator=(const InputMemoryStream& inOther);
 	~InputMemoryStream();
@@ -43,7 +44,7 @@ private:
 
 	void ReAllocBuffer(size_t inNewLength);
 public:
-	OutputMemoryStream();
+	OutputMemoryStream(size_t inCapacity);
 	OutputMemoryStream(const OutputMemoryStream& inOther);
 	OutputMemoryStream& operator=(const OutputMemoryStream& inOther);
 	~OutputMemoryStream();
