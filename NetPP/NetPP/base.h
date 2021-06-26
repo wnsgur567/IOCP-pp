@@ -6,14 +6,18 @@
 #include<iostream>
 #include<vector>
 #include<list>
+#include<unordered_map>
+#include<unordered_set>
 #include<map>
+#include<set>
 #include<algorithm>
 #include<stack>
 #include<queue>
 #undef max
 
-constexpr u_short			SERVERPORT	= 9000;
-constexpr unsigned __int32	BUFSIZE		= 512;
+constexpr u_short			SERVERPORT			= 9000;
+constexpr unsigned __int32	BUFSIZE				= 512;
+constexpr unsigned __int32	STREAMPOOLCAPACITY	= 128;
 #define SOCKET_END	0
 
 class TCPSocket;
@@ -21,6 +25,7 @@ class InputMemoryStream;
 class OutputMemoryStream;
 class RecvPacket;
 class SendPacket;
+class ClientInfo;
 
 using HandlePtr = std::shared_ptr<HANDLE>;
 using TCPSocketPtr = std::shared_ptr<TCPSocket>;
@@ -28,10 +33,13 @@ using InputMemoryStreamPtr = std::shared_ptr<InputMemoryStream>;
 using OutputMemoryStreamPtr = std::shared_ptr<OutputMemoryStream>;
 using RecvPacketPtr = std::shared_ptr<RecvPacket>;
 using SendPacketPtr = std::shared_ptr<SendPacket>;
+using ClientInfoPtr = std::shared_ptr<ClientInfo>;
 
 enum class E_PacketState
 {
-	Error = -1,
+	Error = -2,		// 비정상 종료
+	End = -1,		// 정상 종료
+
 	Idle = 0,
 	InComplete,		// 미완성, 데이터 받는(전송) 중
 	Completed,		// 완성
@@ -43,6 +51,11 @@ enum class E_OverlappedType
 	Send
 };
 
+enum class E_ClientState
+{
+	None
+};
+
 DWORD WINAPI WorkerThread(LPVOID arg);
 
 #include "CriticalSection.h"
@@ -52,6 +65,9 @@ DWORD WINAPI WorkerThread(LPVOID arg);
 #include "SocketUtil.h"
 #include "SocketAddress.h"
 #include "TCPSocket.h"
+
+#include "ClientInfo.h"
+#include "ClientManager.h"
 
 #include "PacketManager.h"
 #include "Packet.h"

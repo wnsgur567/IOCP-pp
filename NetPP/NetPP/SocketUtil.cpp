@@ -74,6 +74,15 @@ HandlePtr SocketUtil::CreateIOCP(LPTHREAD_START_ROUTINE inWorkThreadPtr)
 	return hcpPtr;
 }
 
+HandlePtr SocketUtil::LinkIOCPThread(ClientInfoPtr inInfo)
+{
+	return std::make_shared<HANDLE>(
+		CreateIoCompletionPort((HANDLE)inInfo->GetSockPtr()->GetSock(),
+		*NetworkManager::sInstance->GetHCPPtr(),
+		inInfo->GetID(),
+		0));	
+}
+
 int SocketUtil::Select(
 	const std::vector< TCPSocketPtr >* inReadVec,	//	recv를 감시해야할 socket들
 	std::vector< TCPSocketPtr >* outReadVec,			//	select 가 끝난 후 socket들

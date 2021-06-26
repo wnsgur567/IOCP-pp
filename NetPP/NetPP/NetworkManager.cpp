@@ -16,10 +16,28 @@ NetworkManager::~NetworkManager()
 }
 
 bool NetworkManager::DoFrame()
-{
+{	
 	SocketAddress addr;
+	// block accept
 	TCPSocketPtr pClientSock = m_pListenSock->Accept(addr);
+
+	// set new client
+	ClientInfoPtr newClient = std::make_shared<ClientInfo>(pClientSock, addr);
+	ClientManager::sInstance->RegistNewClient(newClient);
+
+	SocketUtil::LinkIOCPThread(newClient);
+
 	return true;
+}
+
+HandlePtr NetworkManager::GetHCPPtr() const
+{
+	return m_pHcp;
+}
+
+TCPSocketPtr NetworkManager::GetListenSockPtr() const
+{
+	return m_pListenSock;
 }
 
 bool NetworkManager::Init(u_short inPort)

@@ -25,6 +25,12 @@
     <Filter Include="Core_h">
       <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Client_h">
+      <UniqueIdentifier>{b1f18ff7-3ac1-4054-816e-9209936de36c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client">
+      <UniqueIdentifier>{71191999-eacd-43e1-bccc-7760279e19a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base.h">
@@ -51,8 +57,14 @@
     <ClInclude Include="Packet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ClientInfo.h">
+      <Filter>Client_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientManager.h">
+      <Filter>Client_h</Filter>
+    </ClInclude>
     <ClInclude Include="NetworkManager.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>NetCore_h</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,8 +92,14 @@
     <ClCompile Include="Packet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ClientManager.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientInfo.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>NetCore</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
