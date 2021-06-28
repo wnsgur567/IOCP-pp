@@ -26,6 +26,7 @@ class OutputMemoryStream;
 class RecvPacket;
 class SendPacket;
 class ClientInfo;
+class PacketBase;
 
 using HandlePtr = std::shared_ptr<HANDLE>;
 using TCPSocketPtr = std::shared_ptr<TCPSocket>;
@@ -34,6 +35,8 @@ using OutputMemoryStreamPtr = std::shared_ptr<OutputMemoryStream>;
 using RecvPacketPtr = std::shared_ptr<RecvPacket>;
 using SendPacketPtr = std::shared_ptr<SendPacket>;
 using ClientInfoPtr = std::shared_ptr<ClientInfo>;
+using PacketBasePtr = std::shared_ptr<PacketBase>;
+using PacketBaseWeakPtr = std::weak_ptr<PacketBase>;
 
 enum class E_PacketState
 {
@@ -53,21 +56,22 @@ enum class E_OverlappedType
 
 enum class E_ClientState
 {
-	None
+	None,
+
+	Disconnected,
 };
 
-DWORD WINAPI WorkerThread(LPVOID arg);
 
 #include "CriticalSection.h"
 
-#include "NetworkManager.h"
 #include "MemoryStream.h"
 #include "SocketUtil.h"
 #include "SocketAddress.h"
 #include "TCPSocket.h"
-
-#include "ClientInfo.h"
 #include "ClientManager.h"
-
+#include "ClientInfo.h"
 #include "PacketManager.h"
 #include "Packet.h"
+
+#include "NetworkManager.h"
+

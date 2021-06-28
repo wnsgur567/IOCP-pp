@@ -8,7 +8,7 @@ ClientInfo::ClientInfo(TCPSocketPtr inpSock, SocketAddress inAddress)
 {
 }
 
-void ClientInfo::Init(unsigned __int32 inID)
+void ClientInfo::Init(id_t inID)
 {
 	m_id = inID;
 }
@@ -27,7 +27,7 @@ SocketAddress ClientInfo::GetSocketAddr() const
 	return m_address;
 }
 
-unsigned __int32 ClientInfo::GetID() const
+ClientInfo::id_t ClientInfo::GetID() const
 {
 	return m_id;
 }
@@ -35,4 +35,9 @@ unsigned __int32 ClientInfo::GetID() const
 E_ClientState ClientInfo::GetState() const
 {
 	return m_state;
+}
+
+void ClientInfo::SetState(E_ClientState inState)
+{
+	m_state = inState;
 }

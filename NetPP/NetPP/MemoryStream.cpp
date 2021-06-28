@@ -56,6 +56,21 @@ InputMemoryStream::~InputMemoryStream()
 		delete[] m_buffer;
 }
 
+const char* InputMemoryStream::GetBufferPtr()
+{
+	return m_buffer;
+}
+
+size_t InputMemoryStream::GetLength() const
+{
+	return m_head;
+}
+
+size_t InputMemoryStream::GetCapacity() const
+{
+	return m_capacity;
+}
+
 size_t InputMemoryStream::GetRemainDataSize() const
 {
 	return (m_capacity - m_head);
@@ -125,6 +140,11 @@ const char* OutputMemoryStream::GetBufferPtr()
 size_t OutputMemoryStream::GetLength() const
 {
 	return m_head;
+}
+
+size_t OutputMemoryStream::GetCapacity() const
+{
+	return m_capacity;
 }
 
 void OutputMemoryStream::Write(const void* inData, size_t inByteCount)

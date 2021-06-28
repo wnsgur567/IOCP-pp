@@ -3,6 +3,7 @@
 // recv buffer 용
 class InputMemoryStream
 {
+	friend class RecvPacket;	// iocp 용
 private:
 	char* m_buffer;				// 버퍼
 	bool  m_isBufferOwner;		// 버퍼의 소유권이 있을 경우에만 해제하도록								
@@ -15,6 +16,10 @@ public:
 	InputMemoryStream(const InputMemoryStream& inOther);
 	InputMemoryStream& operator=(const InputMemoryStream& inOther);
 	~InputMemoryStream();
+public:
+	const char* GetBufferPtr();
+	size_t GetLength() const;
+	size_t GetCapacity() const;
 public:
 	size_t GetRemainDataSize() const;
 	void Read(void* outData, size_t inByteCount);
@@ -37,6 +42,7 @@ inline void InputMemoryStream::Read(T& outData)
 // send buffer 용
 class OutputMemoryStream
 {
+	friend class SendPacket;	// iocp 용
 private:
 	char* m_buffer;				// 버퍼
 	size_t m_head;				// 쓰기 시작할 현제 head의 위치
@@ -51,7 +57,8 @@ public:
 public:
 	const char* GetBufferPtr();
 	size_t GetLength() const;
-
+	size_t GetCapacity() const;
+public:
 	void Write(const void* inData, size_t inByteCount);
 	template<typename T> void Write(const T& inData);
 	void Wirte(const std::string& inString);

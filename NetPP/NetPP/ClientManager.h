@@ -5,9 +5,10 @@ class ClientManager
 {
 public:
 	static std::unique_ptr<ClientManager> sInstance;
+	using id_t = unsigned __int32;
 private:
-	unsigned __int32 m_newClientID;
-	std::unordered_map<unsigned __int32, ClientInfoPtr> m_IDtoCInfo_dic;
+	id_t m_newClientID;
+	std::unordered_map<id_t, ClientInfoPtr> m_IDtoCInfo_dic;
 private:
 	ClientManager() :m_newClientID(0) {}
 	bool Init();
@@ -19,4 +20,5 @@ public:
 public:
 	// id 셋팅하고 map 에 등록하기
 	void RegistNewClient(ClientInfoPtr inpInfo);
+	ClientInfoPtr GetClientInfo(const id_t inId);
 };

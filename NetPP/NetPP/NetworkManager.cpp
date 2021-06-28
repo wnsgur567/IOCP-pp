@@ -12,20 +12,13 @@ bool NetworkManager::StaticInit(u_short inPort)
 
 NetworkManager::~NetworkManager()
 {
-	SocketUtil::CleanUp(); 
+	SocketUtil::CleanUp();
 }
 
 bool NetworkManager::DoFrame()
-{	
-	SocketAddress addr;
-	// block accept
-	TCPSocketPtr pClientSock = m_pListenSock->Accept(addr);
-
-	// set new client
-	ClientInfoPtr newClient = std::make_shared<ClientInfo>(pClientSock, addr);
-	ClientManager::sInstance->RegistNewClient(newClient);
-
-	SocketUtil::LinkIOCPThread(newClient);
+{
+	if (!SendQueueProcess())
+		return false;
 
 	return true;
 }
@@ -40,10 +33,49 @@ TCPSocketPtr NetworkManager::GetListenSockPtr() const
 	return m_pListenSock;
 }
 
+bool NetworkManager::PushSendQueue(TCPSocketPtr inpSock, SendPacketPtr inpSendPacket)
+{
+	m_sendQueue.push({ inpSock,inpSendPacket });
+	return true;
+}
+
+bool NetworkManager::SendQueueProcess()
+{
+	while (false == m_sendQueue.empty())
+	{
+		std::pair<TCPSocketPtr, SendPacketPtr> item = m_sendQueue.front();
+		m_sendQueue.pop();
+
+		if (false == PacketManager::SendAsync(item.first, item.second))
+			return false;
+	}
+
+	return true;
+}
+
+DWORD __stdcall NetworkManager::AcceptThread(LPVOID arg)
+{
+	SocketAddress addr;
+	TCPSocket* listen_sock = (TCPSocket*)arg;
+
+	while (true)
+	{
+		// block accept
+		TCPSocketPtr pClientSock = listen_sock->Accept(addr);
+
+		// set new client
+		ClientInfoPtr newClient = std::make_shared<ClientInfo>(pClientSock, addr);
+		ClientManager::sInstance->RegistNewClient(newClient);
+		SocketUtil::LinkIOCPThread(newClient);
+	}
+
+	return 0;
+}
+
 bool NetworkManager::Init(u_short inPort)
 {
 	// iocp 입출력 포트 생성
-	m_pHcp = SocketUtil::CreateIOCP(WorkerThread);
+	m_pHcp = SocketUtil::CreateIOCP(PacketManager::WorkerThread);
 	if (m_pHcp.get() == nullptr)
 		return false;
 
@@ -65,6 +97,10 @@ bool NetworkManager::Init(u_short inPort)
 	// listening
 	if (false == m_pListenSock->Listen(SOMAXCONN))
 		return false;
-	
+
+	// create accept thread
+	HANDLE hThread = CreateThread(NULL, 0, NetworkManager::AcceptThread, m_pListenSock.get(), 0, NULL);
+
+
 	return true;
 }

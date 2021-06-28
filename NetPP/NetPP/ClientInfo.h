@@ -2,19 +2,22 @@
 
 class ClientInfo
 {
+public:
+	using id_t = ClientManager::id_t;
 private:
 	TCPSocketPtr m_pSock;
 	SocketAddress m_address;
 private:
-	unsigned __int32 m_id;
+	id_t m_id;
 	E_ClientState m_state;
 public:
 	ClientInfo(TCPSocketPtr inpSock, SocketAddress inAddress);	
-	void Init(unsigned __int32 inID);
+	void Init(id_t inID);
 public:
 	TCPSocketPtr GetSockPtr() const;
 	TCPSocketPtr GetSockPtr();
 	SocketAddress GetSocketAddr() const;
-	unsigned __int32 GetID() const;
+	id_t GetID() const;
 	E_ClientState GetState() const;
+	void SetState(E_ClientState inState);
 };

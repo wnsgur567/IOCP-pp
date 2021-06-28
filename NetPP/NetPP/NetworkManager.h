@@ -3,10 +3,10 @@ class NetworkManager
 {
 public:
 	static std::unique_ptr<NetworkManager> sInstance;
-private:
+protected:
 	HandlePtr	 m_pHcp;			// iocp handle
 	TCPSocketPtr m_pListenSock;
-private:
+protected:
 	NetworkManager() {}
 	bool Init(u_short inPort);
 public:
@@ -16,7 +16,14 @@ public:
 	~NetworkManager();
 public:
 	bool DoFrame();
+
 	HandlePtr GetHCPPtr() const;
 	TCPSocketPtr GetListenSockPtr() const;
+private:
+	std::queue <std::pair<TCPSocketPtr, SendPacketPtr>> m_sendQueue;
+public:
+	bool PushSendQueue(TCPSocketPtr inpSock, SendPacketPtr inpSendPacket);		// sendqueue에등록
+	bool SendQueueProcess();		// send queue에 있는 패킷 처리
+	static DWORD WINAPI AcceptThread(LPVOID arg);
 };
 

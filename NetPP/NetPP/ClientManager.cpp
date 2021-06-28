@@ -25,3 +25,8 @@ void ClientManager::RegistNewClient(ClientInfoPtr inpInfo)
 	m_IDtoCInfo_dic.insert({ m_newClientID,inpInfo });
 	++m_newClientID;
 }
+
+ClientInfoPtr ClientManager::GetClientInfo(const id_t inId)
+{
+	return m_IDtoCInfo_dic[inId];
+}

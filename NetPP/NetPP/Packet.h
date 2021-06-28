@@ -6,60 +6,95 @@ struct OverlappedEx
 {
 	WSAOVERLAPPED overlapped;
 	E_OverlappedType type;
+	PacketBaseWeakPtr pPacket;
 
 	OverlappedEx(E_OverlappedType inType)
-		: type(inType)
+		: overlapped(), type(inType)
 	{
 
+	}
+	void Init(PacketBasePtr inpPacket)
+	{
+		pPacket = inpPacket;
+	}
+	void flush()
+	{
+		ZeroMemory(&overlapped, sizeof(overlapped));
 	}
 };
 
 class PacketBase
 {
+public:
+	using psize_t = PacketManager::psize_t;
+	using id_t = PacketManager::id_t;
 protected:
-	unsigned __int32 m_id;
+	id_t m_id;
 	E_PacketState m_state;
 
 	OverlappedEx m_overlappedEx;
-	WSABUF m_wsabuf;
+	WSABUF		 m_wsabuf;
+	char* m_buf;
+	psize_t		 m_capacity;
 public:
 	unsigned __int32 GetId() const { return m_id; }
 	void SetId(unsigned __int32 inId) { m_id = inId; }
+
+	virtual void Clear() = 0;
 protected:
-	PacketBase(E_OverlappedType inType) : 
-		m_id(0), m_state(E_PacketState::Idle), 
-		m_overlappedEx(inType), m_wsabuf(){}
-	~PacketBase() {}
+	PacketBase(E_OverlappedType inType, const psize_t inCapacity) :
+		m_id(0), m_state(E_PacketState::Idle),
+		m_overlappedEx(inType),
+		m_wsabuf(),
+		m_buf(nullptr), m_capacity(inCapacity)
+	{
+		m_buf = new char[m_capacity];
+	}
+	virtual ~PacketBase()
+	{
+		delete[] m_buf;
+	}
 };
 
 
 // using input stream
 class RecvPacket : public PacketBase
 {
+	friend class PacketManager;
 private:
 	InputMemoryStreamPtr m_pStream;
-	
-	unsigned __int32		m_sizebytes;
-	const unsigned __int32	m_target_sizebytes;
-	unsigned __int32		m_databytes;
-	unsigned __int32		m_target_databytes;
+
+	bool		m_sizeflag;
+	psize_t		m_recvbytes;
+	psize_t		m_target_recvbytes;
 public:
+	RecvPacket(psize_t inStreamCapacity);
 	RecvPacket(InputMemoryStreamPtr inStreamPtr);
 	~RecvPacket();
-
-	void Clear();	
+	
+	void Init(RecvPacketPtr inpThis);
+	void Clear() override;
+	
+	// recv 전 overlapped 및 wsabuf 초기화
+	void GetReady();
 };
 
 // using output stream
 class SendPacket : public PacketBase
 {
+	friend class PacketManager;
 private:
 	OutputMemoryStreamPtr m_pStream;
-	
-	unsigned __int32		m_sendbytes;				// 현재 send 수치
-	unsigned __int32		m_target_sendbytes;			// 목표 send 수치
+
+	psize_t		m_sendbytes;				// 현재 send 수치
+	psize_t		m_target_sendbytes;			// 목표 send 수치
 public:
+	SendPacket(psize_t inStreamCapacity);
 	SendPacket(OutputMemoryStreamPtr inStreamPtr);
-	
-	void Clear();
+
+	void Init(SendPacketPtr inpThis);
+	void Clear() override;
+
+	// recv 전 overlapped 및 wsabuf 초기화
+	void GetReady(const id_t inPacketID);
 };
