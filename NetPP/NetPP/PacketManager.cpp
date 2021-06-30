@@ -6,44 +6,79 @@ bool PacketManager::Init(psize_t inStreamPoolingCapacity)
 {
 	for (psize_t i = 0; i < inStreamPoolingCapacity; i++)
 	{
+		// recvpacket
 		RecvPacketPtr r_ptr = std::make_shared<RecvPacket>(BUFSIZE);
 		r_ptr->Init(r_ptr);
-		m_recvpacket_pool.push(r_ptr);
+		PacketManager::sInstance->m_recvpacket_pool.push(r_ptr);
+		PacketManager::sInstance->m_recvpacket_container.push_back(r_ptr);
+		// sendpacket
 		SendPacketPtr s_ptr = std::make_shared<SendPacket>(BUFSIZE);
 		s_ptr->Init(s_ptr);
-		m_sendpacket_pool.push(s_ptr);
+		PacketManager::sInstance->m_sendpacket_pool.push(s_ptr);
+		PacketManager::sInstance->m_sendpacket_container.push_back(s_ptr);
 	}
 	return true;
 }
 
 bool PacketManager::StaticInit()
 {
+	sInstance.reset(new PacketManager());
+
 	// stream 을 capacity 만큼 생성 및 풀링
 	return PacketManager::sInstance->Init(STREAMPOOLCAPACITY);
 }
 
 PacketManager::~PacketManager()
 {
+
 }
 
+RecvPacketPtr PacketManager::GetRecvPacketFromPool()
+{
+	RecvPacketPtr pRetPacket = m_recvpacket_pool.front();
+	m_recvpacket_pool.pop();
+	pRetPacket->Clear();
+	return pRetPacket;
+}
 
+void PacketManager::RetrieveRecvPacket(RecvPacketPtr inpPacket)
+{
+	m_recvpacket_pool.push(inpPacket);
+}
+
+SendPacketPtr PacketManager::GetSendPacketFromPool()
+{
+	SendPacketPtr pRetPacket = m_sendpacket_pool.front();
+	m_sendpacket_pool.pop();
+	pRetPacket->Clear();
+	return pRetPacket;
+}
+
+void PacketManager::RetrieveSendPacket(SendPacketPtr inpPacket)
+{
+}
 
 void PacketManager::RequestSend(const TCPSocketPtr inpSock, SendPacketPtr inpSendPacket)
 {
 	NetworkManager::sInstance->PushSendQueue(inpSock, inpSendPacket);
 }
 
-bool PacketManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr outRecvPacket)
+bool PacketManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& outRecvPacket)
 {
 	int retval;
 	DWORD recvbytes;
 	DWORD flags = 0;
 
-	outRecvPacket->GetReady();
+	// 풀링된 패킷을 꺼내오기
+	RecvPacketPtr pPacket = PacketManager::sInstance->GetRecvPacketFromPool();	
 
+	// overlap wsa 준비셋팅
+	pPacket->GetReady();
+
+	// 비동기 async 수행
 	retval = WSARecv(inpSock->GetSock(),
-		&outRecvPacket->m_wsabuf, 1, &recvbytes, &flags,
-		&outRecvPacket->m_overlappedEx.overlapped, nullptr);
+		&pPacket->m_wsabuf, 1, &recvbytes, &flags,
+		&pPacket->m_overlappedEx.overlapped, nullptr);
 
 	if (retval == SOCKET_ERROR)
 	{
@@ -53,6 +88,12 @@ bool PacketManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr outRecvP
 			return false;
 		}
 	}
+
+	if (outRecvPacket != nullptr)
+	{
+		outRecvPacket = pPacket;
+	}
+
 	return true;
 }
 
@@ -80,20 +121,20 @@ bool PacketManager::SendAsync(const TCPSocketPtr inpSock, SendPacketPtr inSendPa
 	return true;
 }
 
-E_PacketState PacketManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr outpPacket, const PacketBase::psize_t inCompletebyte)
+E_PacketState PacketManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr& inoutpPacket, const PacketBase::psize_t inCompletebyte)
 {
-	if (outpPacket->m_sizeflag)
+	if (inoutpPacket->m_sizeflag)
 	{
-		outpPacket->m_recvbytes += inCompletebyte;
+		inoutpPacket->m_recvbytes += inCompletebyte;
 
-		if (outpPacket->m_recvbytes == sizeof(PacketBase::psize_t))
+		if (inoutpPacket->m_recvbytes == sizeof(PacketBase::psize_t))
 		{
-			memcpy(&outpPacket->m_target_recvbytes, outpPacket->m_buf, sizeof(PacketBase::psize_t));
-			outpPacket->m_recvbytes = 0;
-			outpPacket->m_sizeflag = false;
+			memcpy(&inoutpPacket->m_target_recvbytes, inoutpPacket->m_buf, sizeof(PacketBase::psize_t));
+			inoutpPacket->m_recvbytes = 0;
+			inoutpPacket->m_sizeflag = false;
 		}
 
-		if (!PacketManager::RecvAsync(inpSock, outpPacket))
+		if (!PacketManager::RecvAsync(inpSock, inoutpPacket))
 		{
 			return E_PacketState::Error;
 		}
@@ -101,11 +142,11 @@ E_PacketState PacketManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr ou
 		return E_PacketState::InComplete;
 	}
 
-	outpPacket->m_recvbytes += inCompletebyte;
+	inoutpPacket->m_recvbytes += inCompletebyte;
 
-	if (outpPacket->m_recvbytes != outpPacket->m_target_recvbytes)
+	if (inoutpPacket->m_recvbytes != inoutpPacket->m_target_recvbytes)
 	{
-		if (!PacketManager::RecvAsync(inpSock, outpPacket))
+		if (!PacketManager::RecvAsync(inpSock, inoutpPacket))
 		{
 			return E_PacketState::Error;
 		}
@@ -173,9 +214,13 @@ DWORD __stdcall PacketManager::WorkerThread(LPVOID arg)
 		{
 		case  E_OverlappedType::Recv:
 		{
+			// down casting
+			RecvPacketPtr pRecvPacket = std::static_pointer_cast<RecvPacket>(pPacket.lock());
+
+			// recv 완료 확인
 			result = PacketManager::CompleteRecv(
 				client_info->GetSockPtr(),
-				std::static_pointer_cast<RecvPacket>(pPacket.lock()),
+				pRecvPacket,
 				cbTransferred);
 			switch (result)
 			{
@@ -186,13 +231,18 @@ DWORD __stdcall PacketManager::WorkerThread(LPVOID arg)
 			case E_PacketState::InComplete:
 				continue;
 			case E_PacketState::Completed:
+				// 완료된 경우 시간을 기록
+				pRecvPacket->RecordRecvTime();
 				break;
 			}
 
 			// complete recv process
+			PacketManager::sInstance->OnCompleteRecv(nullptr);
 
+			// recv 날려놓기
+			RecvPacketPtr pOutRecvPacket;
 			if (!RecvAsync(client_info->GetSockPtr(), 
-				std::static_pointer_cast<RecvPacket>(pPacket.lock())))
+				pOutRecvPacket))
 			{
 				continue;
 			}
@@ -219,11 +269,10 @@ DWORD __stdcall PacketManager::WorkerThread(LPVOID arg)
 			}
 
 			// complete send process;
-
+			PacketManager::sInstance->OnCompleteSend(nullptr);
 		}
 		break;
 		}
-
 	}
 
 	return 0;

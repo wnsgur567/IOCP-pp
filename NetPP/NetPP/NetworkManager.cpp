@@ -67,6 +67,10 @@ DWORD __stdcall NetworkManager::AcceptThread(LPVOID arg)
 		ClientInfoPtr newClient = std::make_shared<ClientInfo>(pClientSock, addr);
 		ClientManager::sInstance->RegistNewClient(newClient);
 		SocketUtil::LinkIOCPThread(newClient);
+
+		// 최초 recv 날리기
+		RecvPacketPtr pTmpPacket;
+		PacketManager::RecvAsync(pClientSock, pTmpPacket);
 	}
 
 	return 0;

@@ -34,8 +34,8 @@ protected:
 
 	OverlappedEx m_overlappedEx;
 	WSABUF		 m_wsabuf;
-	char* m_buf;
 	psize_t		 m_capacity;
+	char* m_buf;
 public:
 	unsigned __int32 GetId() const { return m_id; }
 	void SetId(unsigned __int32 inId) { m_id = inId; }
@@ -46,7 +46,8 @@ protected:
 		m_id(0), m_state(E_PacketState::Idle),
 		m_overlappedEx(inType),
 		m_wsabuf(),
-		m_buf(nullptr), m_capacity(inCapacity)
+		m_capacity(inCapacity),
+		m_buf(nullptr)
 	{
 		m_buf = new char[m_capacity];
 	}
@@ -61,22 +62,33 @@ protected:
 class RecvPacket : public PacketBase
 {
 	friend class PacketManager;
+public:
+	using time_point_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
+	
 private:
 	InputMemoryStreamPtr m_pStream;
 
 	bool		m_sizeflag;
 	psize_t		m_recvbytes;
 	psize_t		m_target_recvbytes;
+
+	time_point_t m_recv_time;	// 패킷 수신이 완료된 시간 complete recv
 public:
 	RecvPacket(psize_t inStreamCapacity);
 	RecvPacket(InputMemoryStreamPtr inStreamPtr);
 	~RecvPacket();
-	
+
 	void Init(RecvPacketPtr inpThis);
+	// packet을 get 하여 처음 사용하기 시작할때 호출 됨
 	void Clear() override;
-	
+
 	// recv 전 overlapped 및 wsabuf 초기화
 	void GetReady();
+	InputMemoryStreamPtr GetStream();
+
+	// 패킷 recv 가 완료된 시간을 기록
+	void RecordRecvTime();
+	time_point_t GetRecvTime() const;
 };
 
 // using output stream
@@ -92,7 +104,8 @@ public:
 	SendPacket(psize_t inStreamCapacity);
 	SendPacket(OutputMemoryStreamPtr inStreamPtr);
 
-	void Init(SendPacketPtr inpThis);
+	void Init(SendPacketPtr inpThis);.
+	// packet을 get 하여 처음 사용하기 시작할때 호출 됨
 	void Clear() override;
 
 	// recv 전 overlapped 및 wsabuf 초기화

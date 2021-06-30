@@ -13,6 +13,7 @@
 #include<algorithm>
 #include<stack>
 #include<queue>
+#include<chrono>
 #undef max
 
 constexpr u_short			SERVERPORT			= 9000;
@@ -75,3 +76,7 @@ enum class E_ClientState
 
 #include "NetworkManager.h"
 
+
+//////////////////////////////////
+
+#include "ApplicationLevelTest.h"

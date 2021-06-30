@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ApplicationLevelTest.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="ClientManager.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="TCPSocket.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApplicationLevelTest.cpp" />
     <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="ClientManager.cpp" />
     <ClCompile Include="CriticalSection.cpp" />

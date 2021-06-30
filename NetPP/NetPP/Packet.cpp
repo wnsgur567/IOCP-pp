@@ -7,6 +7,7 @@ RecvPacket::RecvPacket(psize_t inStreamCapacity)
 	m_recvbytes(0),
 	m_target_recvbytes(0)
 {
+	m_pStream = std::make_shared<InputMemoryStream>(inStreamCapacity);
 }
 
 RecvPacket::RecvPacket(InputMemoryStreamPtr inStreamPtr)
@@ -26,7 +27,13 @@ RecvPacket::~RecvPacket()
 
 void RecvPacket::GetReady()
 {
+	// overlap 초기화
 	m_overlappedEx.flush();
+
+	// 
+
+
+	// wsabuf 초기화
 	m_wsabuf.buf = m_pStream->m_buffer + m_recvbytes;
 	if (m_sizeflag)
 	{
@@ -38,6 +45,21 @@ void RecvPacket::GetReady()
 	}
 }
 
+InputMemoryStreamPtr RecvPacket::GetStream()
+{
+	return m_pStream;
+}
+
+void RecvPacket::RecordRecvTime()
+{
+	m_recv_time = std::chrono::high_resolution_clock::now();
+}
+
+RecvPacket::time_point_t RecvPacket::GetRecvTime() const
+{
+	return m_recv_time;
+}
+
 void RecvPacket::Init(RecvPacketPtr inpThis)
 {
 	m_overlappedEx.pPacket = inpThis;
@@ -45,9 +67,14 @@ void RecvPacket::Init(RecvPacketPtr inpThis)
 
 void RecvPacket::Clear()
 {
+	// base
+	m_id = 0;
+	m_state = E_PacketState::Idle;
+
+	// this
 	m_sizeflag = true;
 	m_recvbytes = 0;
-	m_target_recvbytes = 0;
+	m_target_recvbytes = 0;	
 }
 
 
