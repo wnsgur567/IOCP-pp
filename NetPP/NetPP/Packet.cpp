@@ -74,7 +74,7 @@ void RecvPacket::Clear()
 	// this
 	m_sizeflag = true;
 	m_recvbytes = 0;
-	m_target_recvbytes = 0;	
+	m_target_recvbytes = 0;
 }
 
 
@@ -127,3 +127,18 @@ void SendPacket::Clear()
 	m_target_sendbytes = 0;
 }
 
+TCPSocketPtr AcceptPacket::GetPSock()
+{
+	return m_pClientSock;
+}
+
+SocketAddress AcceptPacket::GetAddr()
+{
+	return m_sockAddr;
+}
+
+void AcceptPacket::Clear()
+{
+	m_pClientSock = nullptr;
+	ZeroMemory(&m_sockAddr, sizeof(m_sockAddr));
+}

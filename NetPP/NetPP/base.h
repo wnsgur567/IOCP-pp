@@ -14,11 +14,13 @@
 #include<stack>
 #include<queue>
 #include<chrono>
-#undef max
 
-constexpr u_short			SERVERPORT			= 9000;
-constexpr unsigned __int32	BUFSIZE				= 512;
-constexpr unsigned __int32	STREAMPOOLCAPACITY	= 128;
+#undef max
+using Byte = char;
+
+constexpr u_short			SERVERPORT = 9000;
+constexpr unsigned __int32	BUFSIZE = 512;
+constexpr unsigned __int32	STREAMPOOLCAPACITY = 128;
 #define SOCKET_END	0
 
 class TCPSocket;
@@ -28,6 +30,7 @@ class RecvPacket;
 class SendPacket;
 class ClientInfo;
 class PacketBase;
+class IOCPNetworkManager;
 
 using HandlePtr = std::shared_ptr<HANDLE>;
 using TCPSocketPtr = std::shared_ptr<TCPSocket>;
@@ -51,8 +54,9 @@ enum class E_PacketState
 
 enum class E_OverlappedType
 {
+	Accept,
 	Recv,
-	Send
+	Send,
 };
 
 enum class E_ClientState
@@ -62,9 +66,11 @@ enum class E_ClientState
 	Disconnected,
 };
 
-
+// core
+#include "Singleton.h"
 #include "CriticalSection.h"
 
+// net core & client 
 #include "MemoryStream.h"
 #include "SocketUtil.h"
 #include "SocketAddress.h"

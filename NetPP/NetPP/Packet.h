@@ -7,9 +7,11 @@ struct OverlappedEx
 	WSAOVERLAPPED overlapped;
 	E_OverlappedType type;
 	PacketBaseWeakPtr pPacket;
+	void* ptr;
 
 	OverlappedEx(E_OverlappedType inType)
 		: overlapped(), type(inType)
+		, ptr(nullptr)
 	{
 
 	}
@@ -35,7 +37,7 @@ protected:
 	OverlappedEx m_overlappedEx;
 	WSABUF		 m_wsabuf;
 	psize_t		 m_capacity;
-	char* m_buf;
+	Byte* m_buf;
 public:
 	unsigned __int32 GetId() const { return m_id; }
 	void SetId(unsigned __int32 inId) { m_id = inId; }
@@ -49,12 +51,35 @@ protected:
 		m_capacity(inCapacity),
 		m_buf(nullptr)
 	{
-		m_buf = new char[m_capacity];
+		if (m_capacity > 0)
+			m_buf = new Byte[m_capacity];
 	}
 	virtual ~PacketBase()
 	{
-		delete[] m_buf;
+		if (m_buf != nullptr)
+			delete[] m_buf;
 	}
+};
+
+class AcceptPacket : public PacketBase
+{
+	friend class PacketManager;
+	friend class ICOPNetworkManager;
+private:
+	TCPSocketPtr m_pClientSock;
+	SocketAddress m_sockAddr;
+
+public:
+	AcceptPacket(TCPSocketPtr inSock, SocketAddress inAddr)
+		:PacketBase(E_OverlappedType::Accept, 0),
+		m_pClientSock(inSock), m_sockAddr(inAddr)
+	{
+
+	}
+
+	TCPSocketPtr GetPSock();
+	SocketAddress GetAddr();
+	void Clear() override;
 };
 
 
@@ -62,11 +87,12 @@ protected:
 class RecvPacket : public PacketBase
 {
 	friend class PacketManager;
+	friend class ICOPNetworkManager;
 public:
 	using time_point_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
-	
+
 private:
-	InputMemoryStreamPtr m_pStream;
+	InputMemoryStreamPtr m_pStream;	// session 에서 사용할 datastream
 
 	bool		m_sizeflag;
 	psize_t		m_recvbytes;
@@ -95,8 +121,9 @@ public:
 class SendPacket : public PacketBase
 {
 	friend class PacketManager;
+	friend class ICOPNetworkManager;
 private:
-	OutputMemoryStreamPtr m_pStream;
+	OutputMemoryStreamPtr m_pStream; // session 에서 사용할 datastream
 
 	psize_t		m_sendbytes;				// 현재 send 수치
 	psize_t		m_target_sendbytes;			// 목표 send 수치
@@ -104,7 +131,7 @@ public:
 	SendPacket(psize_t inStreamCapacity);
 	SendPacket(OutputMemoryStreamPtr inStreamPtr);
 
-	void Init(SendPacketPtr inpThis);.
+	void Init(SendPacketPtr inpThis);
 	// packet을 get 하여 처음 사용하기 시작할때 호출 됨
 	void Clear() override;
 

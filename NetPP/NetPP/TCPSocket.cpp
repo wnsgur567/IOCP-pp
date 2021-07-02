@@ -1,7 +1,7 @@
 #include "base.h"
 
 TCPSocket::TCPSocket(SOCKET inSocket)
-	: m_socket(inSocket)
+	: m_socket(inSocket), m_isBlock(true)
 {
 
 }
@@ -15,6 +15,11 @@ TCPSocket::~TCPSocket()
 SOCKET TCPSocket::GetSock() const
 {
 	return m_socket;
+}
+
+bool TCPSocket::IsBlockSock() const
+{
+	return m_isBlock;
 }
 
 bool TCPSocket::Bind(const SocketAddress& inAddress)
@@ -42,11 +47,18 @@ TCPSocketPtr TCPSocket::Accept(SocketAddress& outFromAddress)
 	socklen_t len = sizeof(sockaddr_in);
 	SOCKET _new_sock = accept(m_socket, (sockaddr*)&(outFromAddress.GetSockAddr()), &len);
 
+	if (EWOULDBLOCK == _new_sock)
+	{
+		SocketUtil::ReportError("TCPSocket::Accept Nonblock");
+		return nullptr;
+	}
+
 	if (_new_sock == INVALID_SOCKET)
 	{
 		SocketUtil::ReportError("TCPSocket::Accept");
 		return nullptr;
 	}
+
 	return std::make_shared<TCPSocket>(_new_sock);
 }
 
@@ -70,6 +82,8 @@ bool TCPSocket::SetNonBlockingMode(bool inIsNonBlock)
 		SocketUtil::ReportError("TCPSocket::SetNonBlockingMode");
 		return false;
 	}
+
+	m_isBlock = !inIsNonBlock;
 	return true;
 }
 

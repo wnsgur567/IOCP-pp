@@ -78,7 +78,7 @@ HandlePtr SocketUtil::LinkIOCPThread(ClientInfoPtr inInfo)
 {
 	return std::make_shared<HANDLE>(
 		CreateIoCompletionPort((HANDLE)inInfo->GetSockPtr()->GetSock(),
-		*NetworkManager::sInstance->GetHCPPtr(),
+		*ICOPNetworkManager::sInstance->GetHCPPtr(),
 		inInfo->GetID(),
 		0));	
 }
