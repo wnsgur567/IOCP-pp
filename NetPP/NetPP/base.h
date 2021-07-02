@@ -26,6 +26,7 @@ constexpr unsigned __int32	STREAMPOOLCAPACITY = 128;
 class TCPSocket;
 class InputMemoryStream;
 class OutputMemoryStream;
+class AcceptPacket;
 class RecvPacket;
 class SendPacket;
 class ClientInfo;
@@ -36,6 +37,7 @@ using HandlePtr = std::shared_ptr<HANDLE>;
 using TCPSocketPtr = std::shared_ptr<TCPSocket>;
 using InputMemoryStreamPtr = std::shared_ptr<InputMemoryStream>;
 using OutputMemoryStreamPtr = std::shared_ptr<OutputMemoryStream>;
+using AcceptPacketPtr = std::shared_ptr<AcceptPacket>;
 using RecvPacketPtr = std::shared_ptr<RecvPacket>;
 using SendPacketPtr = std::shared_ptr<SendPacket>;
 using ClientInfoPtr = std::shared_ptr<ClientInfo>;
@@ -57,6 +59,14 @@ enum class E_OverlappedType
 	Accept,
 	Recv,
 	Send,
+};
+
+enum class E_SessionType
+{
+	None,
+
+	Sign,
+
 };
 
 enum class E_ClientState

@@ -30,9 +30,9 @@ public:
 	// 일반 동기화의 경우 소켓당 한개씩만 매칭 시킬 것
 	std::queue<RecvPacketPtr> m_recvpacket_pool;
 	std::queue<SendPacketPtr> m_sendpacket_pool;
-
 	
 private:
+	// TODO : 각 클라이언트 별로 관리하게 바꾸자
 	unsigned __int32 m_curRecvPacketID;		// 최근에 받은 recv packet id
 	unsigned __int32 m_newSendPacketID;		// 새로 만들 send packet id
 public:

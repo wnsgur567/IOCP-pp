@@ -41,6 +41,8 @@ public:
 	DisconnectedCallBack OnDisconnected;
 protected:
 	HandlePtr	 m_pHcp;
+	std::vector<HANDLE> m_hAcceptThreads;
+	std::vector<HANDLE> m_hWorkerThreads;
 	std::queue <std::pair<TCPSocketPtr, SendPacketPtr>> m_sendQueue;
 protected:
 	ICOPNetworkManager()

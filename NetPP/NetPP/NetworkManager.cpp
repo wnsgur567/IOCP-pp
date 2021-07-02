@@ -65,7 +65,7 @@ TCPSocketPtr NetworkManager::GetListenSockPtr() const
 //	return 0;
 //}
 
-bool ICOPNetworkManager::Init(u_short inPort, bool isInNonBlock = true)
+bool ICOPNetworkManager::Init(u_short inPort, bool isInNonBlock = false)
 {
 	// iocp 입출력 포트 생성
 	m_pHcp = SocketUtil::CreateIOCP(ICOPNetworkManager::WorkerThread);
@@ -98,14 +98,14 @@ ICOPNetworkManager::~ICOPNetworkManager()
 
 bool ICOPNetworkManager::DoFrame()
 {
-	// nonblock accept
-	SocketAddress addr;
-	TCPSocketPtr pClientSock = m_pListenSock->Accept(addr);
+	//// nonblock accept
+	//SocketAddress addr;
+	//TCPSocketPtr pClientSock = m_pListenSock->Accept(addr);
 
-	if (pClientSock != nullptr)
-	{
-		// post to iocp queue
-	}
+	//if (pClientSock != nullptr)
+	//{
+	//	// post
+	//}
 
 	// send process
 	if (!SendQueueProcess())
