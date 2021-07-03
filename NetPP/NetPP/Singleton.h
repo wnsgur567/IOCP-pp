@@ -14,13 +14,19 @@ public:
 	Singleton(const Singleton&) = delete;
 	Singleton& operator=(const Singleton&) = delete;
 	static bool StaticInit()
-	{
-		sInstance.reset(new T());
-		return sInstance->Init();
+	{		
+		if (false == sInstance->StaticInitialize())
+			return false;
+		return sInstance->Initialize();
 	}
-	virtual Init() = 0;
 	virtual ~Singleton()
 	{
 
 	}
+protected:
+	virtual bool StaticInitialize() = 0;
+public:
+	virtual bool Initialize() = 0;
+	virtual void Finalize() = 0;
 };
+

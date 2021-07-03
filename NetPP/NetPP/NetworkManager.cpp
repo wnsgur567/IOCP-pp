@@ -1,6 +1,6 @@
 #include "base.h"
 
-std::unique_ptr<ICOPNetworkManager> ICOPNetworkManager::sInstance;
+std::unique_ptr<IOCPNetworkManager> IOCPNetworkManager::sInstance;
 
 bool NetworkManager::Init(u_short inPort, bool isInNonBlock)
 {
@@ -42,33 +42,12 @@ TCPSocketPtr NetworkManager::GetListenSockPtr() const
 }
 
 
-//DWORD __stdcall NetworkManager::AcceptThread(LPVOID arg)
-//{
-//	SocketAddress addr;
-//	TCPSocket* listen_sock = (TCPSocket*)arg;
-//
-//	while (true)
-//	{
-//		// block accept
-//		TCPSocketPtr pClientSock = listen_sock->Accept(addr);
-//
-//		// set new client
-//		ClientInfoPtr newClient = std::make_shared<ClientInfo>(pClientSock, addr);
-//		ClientManager::sInstance->RegistNewClient(newClient);
-//		SocketUtil::LinkIOCPThread(newClient);
-//
-//		// 최초 recv 날리기
-//		RecvPacketPtr pTmpPacket;
-//		PacketManager::RecvAsync(pClientSock, pTmpPacket);
-//	}
-//
-//	return 0;
-//}
 
-bool ICOPNetworkManager::Init(u_short inPort, bool isInNonBlock = false)
+
+bool IOCPNetworkManager::Init(u_short inPort, bool isInNonBlock = false)
 {
 	// iocp 입출력 포트 생성
-	m_pHcp = SocketUtil::CreateIOCP(ICOPNetworkManager::WorkerThread);
+	m_pHcp = SocketUtil::CreateIOCP(IOCPNetworkManager::WorkerThread, m_hWorkerThreads);
 	if (m_pHcp.get() == nullptr)
 		return false;
 
@@ -76,13 +55,21 @@ bool ICOPNetworkManager::Init(u_short inPort, bool isInNonBlock = false)
 	if (false == NetworkManager::Init(inPort, isInNonBlock))
 		return false;
 
+	// create accept thread
+	HANDLE hThread = CreateThread(NULL, 0,
+		AcceptThread,
+		&IOCPNetworkManager::sInstance->m_pListenSock,
+		0, NULL);
+
+	m_hAcceptThreads.push_back(std::make_shared<HANDLE>(hThread));
+
 	return true;
 }
 
-bool ICOPNetworkManager::StaticInit(u_short inPort)
+bool IOCPNetworkManager::StaticInit(u_short inPort)
 {
 	// singleton init
-	sInstance.reset(new ICOPNetworkManager());
+	sInstance.reset(new IOCPNetworkManager());
 
 	// wsa init
 	if (false == SocketUtil::Init())
@@ -92,21 +79,12 @@ bool ICOPNetworkManager::StaticInit(u_short inPort)
 	return sInstance->Init(inPort);
 }
 
-ICOPNetworkManager::~ICOPNetworkManager()
+IOCPNetworkManager::~IOCPNetworkManager()
 {
 }
 
-bool ICOPNetworkManager::DoFrame()
-{
-	//// nonblock accept
-	//SocketAddress addr;
-	//TCPSocketPtr pClientSock = m_pListenSock->Accept(addr);
-
-	//if (pClientSock != nullptr)
-	//{
-	//	// post
-	//}
-
+bool IOCPNetworkManager::DoFrame()
+{	
 	// send process
 	if (!SendQueueProcess())
 		return false;
@@ -114,25 +92,25 @@ bool ICOPNetworkManager::DoFrame()
 	return true;
 }
 
-HandlePtr ICOPNetworkManager::GetHCPPtr() const
+HandlePtr IOCPNetworkManager::GetHCPPtr() const
 {
 	return m_pHcp;
 }
 
-bool ICOPNetworkManager::PushSendQueue(TCPSocketPtr inpSock, SendPacketPtr inpSendPacket)
+bool IOCPNetworkManager::PushSendQueue(TCPSocketPtr inpSock, SendPacketPtr inpSendPacket)
 {
 	m_sendQueue.push({ inpSock,inpSendPacket });
 	return true;
 }
 
-bool ICOPNetworkManager::SendQueueProcess()
+bool IOCPNetworkManager::SendQueueProcess()
 {
 	while (false == m_sendQueue.empty())
 	{
 		std::pair<TCPSocketPtr, SendPacketPtr> item = m_sendQueue.front();
 		m_sendQueue.pop();
 
-		if (false == ICOPNetworkManager::SendAsync(item.first, item.second))
+		if (false == IOCPNetworkManager::SendAsync(item.first, item.second))
 			return false;
 	}
 
@@ -140,7 +118,33 @@ bool ICOPNetworkManager::SendQueueProcess()
 }
 
 
-bool ICOPNetworkManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& outRecvPacket)
+DWORD __stdcall IOCPNetworkManager::AcceptThread(LPVOID arg)
+{
+	SocketAddress addr;
+	TCPSocket* listen_sock = (TCPSocket*)arg;
+
+	while (true)
+	{
+		// accept
+		TCPSocketPtr pClientSock = listen_sock->Accept(addr);
+
+		{// lock
+			AutoLocker locker(IOCPSession::sInstance->GetCSPtr());
+
+			// post to iocp queue
+			AcceptPacketPtr pAcceptPacket = PacketManager::sInstance->GetAcceptPacketFromPool();
+			PostQueuedCompletionStatus(
+				*IOCPNetworkManager::sInstance->m_pHcp,
+				0,
+				(ULONG_PTR)&pAcceptPacket,
+				&pAcceptPacket->m_overlappedEx.overlapped);
+		}// lock end
+	}
+
+	return 0;
+}
+
+bool IOCPNetworkManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& outRecvPacket)
 {
 	int retval;
 	DWORD recvbytes;
@@ -174,7 +178,7 @@ bool ICOPNetworkManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& ou
 	return true;
 }
 
-bool ICOPNetworkManager::SendAsync(const TCPSocketPtr inpSock, SendPacketPtr inSendPacket)
+bool IOCPNetworkManager::SendAsync(const TCPSocketPtr inpSock, SendPacketPtr inSendPacket)
 {
 	int retval;
 	DWORD sendbytes;
@@ -198,7 +202,7 @@ bool ICOPNetworkManager::SendAsync(const TCPSocketPtr inpSock, SendPacketPtr inS
 	return true;
 }
 
-E_PacketState ICOPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr& inoutpPacket, const PacketBase::psize_t inCompletebyte)
+E_PacketState IOCPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr& inoutpPacket, const PacketBase::psize_t inCompletebyte)
 {
 	if (inoutpPacket->m_sizeflag)
 	{
@@ -211,7 +215,7 @@ E_PacketState ICOPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketP
 			inoutpPacket->m_sizeflag = false;
 		}
 
-		if (!ICOPNetworkManager::RecvAsync(inpSock, inoutpPacket))
+		if (!IOCPNetworkManager::RecvAsync(inpSock, inoutpPacket))
 		{
 			return E_PacketState::Error;
 		}
@@ -223,7 +227,7 @@ E_PacketState ICOPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketP
 
 	if (inoutpPacket->m_recvbytes != inoutpPacket->m_target_recvbytes)
 	{
-		if (!ICOPNetworkManager::RecvAsync(inpSock, inoutpPacket))
+		if (!IOCPNetworkManager::RecvAsync(inpSock, inoutpPacket))
 		{
 			return E_PacketState::Error;
 		}
@@ -232,12 +236,12 @@ E_PacketState ICOPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketP
 	return E_PacketState::Completed;
 }
 
-E_PacketState ICOPNetworkManager::CompleteSend(TCPSocketPtr inpSock, SendPacketPtr inpPacket, const PacketBase::psize_t inCompletebyte)
+E_PacketState IOCPNetworkManager::CompleteSend(TCPSocketPtr inpSock, SendPacketPtr inpPacket, const PacketBase::psize_t inCompletebyte)
 {
 	inpPacket->m_sendbytes += inCompletebyte;
 	if (inpPacket->m_sendbytes != inpPacket->m_target_sendbytes)
 	{
-		if (!ICOPNetworkManager::SendAsync(inpSock, inpPacket))
+		if (!IOCPNetworkManager::SendAsync(inpSock, inpPacket))
 		{
 			return E_PacketState::Error;
 		}
@@ -246,7 +250,7 @@ E_PacketState ICOPNetworkManager::CompleteSend(TCPSocketPtr inpSock, SendPacketP
 	return E_PacketState::Completed;
 }
 
-DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
+DWORD __stdcall IOCPNetworkManager::WorkerThread(LPVOID arg)
 {
 	int retval;
 	HANDLE hcp = (HANDLE)arg;
@@ -281,6 +285,8 @@ DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
 		if (client_info->GetState() == E_ClientState::Disconnected)
 		{
 			//RemoveClientInfo(ptr);
+			// callback
+			IOCPNetworkManager::sInstance->OnDisconnected(client_info);
 			continue;
 		}
 
@@ -289,13 +295,22 @@ DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
 
 		switch (overlapped->type)
 		{
+		case E_OverlappedType::Accept:
+		{
+			// down casting
+			AcceptPacketPtr pAcceptPacket = std::static_pointer_cast<AcceptPacket>(pPacket.lock());
+			// callback
+			IOCPNetworkManager::sInstance->OnCompleteAccept(pAcceptPacket->m_pClientSock, pAcceptPacket->m_sockAddr);
+		}
+		break;
+
 		case  E_OverlappedType::Recv:
 		{
 			// down casting
 			RecvPacketPtr pRecvPacket = std::static_pointer_cast<RecvPacket>(pPacket.lock());
 
 			// recv 완료 확인
-			result = ICOPNetworkManager::CompleteRecv(
+			result = IOCPNetworkManager::CompleteRecv(
 				client_info->GetSockPtr(),
 				pRecvPacket,
 				cbTransferred);
@@ -314,7 +329,10 @@ DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
 			}
 
 			// complete recv process
-			ICOPNetworkManager::sInstance->OnCompleteRecv(nullptr);
+			IOCPNetworkManager::sInstance->OnCompleteRecv(nullptr);
+
+			// TODO : Retrieve packet
+			PacketManager::sInstance->RetrieveRecvPacket(pRecvPacket);
 
 			// recv 날려놓기
 			RecvPacketPtr pOutRecvPacket;
@@ -328,7 +346,10 @@ DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
 
 		case E_OverlappedType::Send:
 		{
-			result = ICOPNetworkManager::CompleteSend(
+			// down casting
+			SendPacketPtr pSendPacket = std::static_pointer_cast<SendPacket>(pPacket.lock());
+
+			result = IOCPNetworkManager::CompleteSend(
 				client_info->GetSockPtr(),
 				std::static_pointer_cast<SendPacket>(pPacket.lock()),
 				cbTransferred);
@@ -346,7 +367,10 @@ DWORD __stdcall ICOPNetworkManager::WorkerThread(LPVOID arg)
 			}
 
 			// complete send process;
-			ICOPNetworkManager::sInstance->OnCompleteSend(nullptr);
+			IOCPNetworkManager::sInstance->OnCompleteSend(nullptr);
+
+			// TODO : Retrieve packet
+			PacketManager::sInstance->RetrieveSendPacket(pSendPacket);
 		}
 		break;
 		}

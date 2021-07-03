@@ -6,6 +6,7 @@ class ClientManager
 public:
 	static std::unique_ptr<ClientManager> sInstance;
 	using id_t = unsigned __int32;
+	using pid_t = PacketManager::id_t;
 private:
 	id_t m_newClientID;
 	std::unordered_map<id_t, ClientInfoPtr> m_IDtoCInfo_dic;

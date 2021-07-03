@@ -32,6 +32,7 @@ class SendPacket;
 class ClientInfo;
 class PacketBase;
 class IOCPNetworkManager;
+class IOCPSession;
 
 using HandlePtr = std::shared_ptr<HANDLE>;
 using TCPSocketPtr = std::shared_ptr<TCPSocket>;
@@ -85,12 +86,14 @@ enum class E_ClientState
 #include "SocketUtil.h"
 #include "SocketAddress.h"
 #include "TCPSocket.h"
-#include "ClientManager.h"
-#include "ClientInfo.h"
 #include "PacketManager.h"
 #include "Packet.h"
+#include "ClientManager.h"
+#include "ClientInfo.h"
 
 #include "NetworkManager.h"
+
+#include "Session.h"
 
 
 //////////////////////////////////

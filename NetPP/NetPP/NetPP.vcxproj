@@ -113,7 +113,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
@@ -139,7 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ApplicationLevelTest.h" />
     <ClInclude Include="base.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="ClientManager.h" />
@@ -148,13 +147,13 @@
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketManager.h" />
+    <ClInclude Include="Session.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="SocketAddress.h" />
     <ClInclude Include="SocketUtil.h" />
     <ClInclude Include="TCPSocket.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ApplicationLevelTest.cpp" />
     <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="ClientManager.cpp" />
     <ClCompile Include="CriticalSection.cpp" />
@@ -163,6 +162,7 @@
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketManager.cpp" />
+    <ClCompile Include="Session.cpp" />
     <ClCompile Include="SocketAddress.cpp" />
     <ClCompile Include="SocketUtil.cpp" />
     <ClCompile Include="TCPSocket.cpp" />

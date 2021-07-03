@@ -13,23 +13,29 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="NetCore">
-      <UniqueIdentifier>{aa8d8d78-e4dc-4f77-ae1a-14141bdcf18f}</UniqueIdentifier>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{1bbe6d83-5835-423a-9643-f5d27b15ecda}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NetCore_h">
+    <Filter Include="Engine\NetCore_h">
       <UniqueIdentifier>{8922028c-849e-4b8e-8415-70fcd54a9db9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{370d0d90-8c48-49b3-b48f-588852f31d5b}</UniqueIdentifier>
+    <Filter Include="Engine\Client">
+      <UniqueIdentifier>{71191999-eacd-43e1-bccc-7760279e19a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core_h">
-      <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Client_h">
+    <Filter Include="Engine\Client_h">
       <UniqueIdentifier>{b1f18ff7-3ac1-4054-816e-9209936de36c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Client">
-      <UniqueIdentifier>{71191999-eacd-43e1-bccc-7760279e19a4}</UniqueIdentifier>
+    <Filter Include="Engine\Core">
+      <UniqueIdentifier>{370d0d90-8c48-49b3-b48f-588852f31d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core_h">
+      <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\NetCore">
+      <UniqueIdentifier>{aa8d8d78-e4dc-4f77-ae1a-14141bdcf18f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application">
+      <UniqueIdentifier>{25828cb8-bd53-494c-a914-b97406aeec67}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -37,78 +43,78 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="TCPSocket.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketAddress.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketUtil.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="CriticalSection.h">
-      <Filter>Core_h</Filter>
+      <Filter>Engine\Core_h</Filter>
     </ClInclude>
     <ClInclude Include="MemoryStream.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="ClientInfo.h">
-      <Filter>Client_h</Filter>
+      <Filter>Engine\Client_h</Filter>
     </ClInclude>
     <ClInclude Include="ClientManager.h">
-      <Filter>Client_h</Filter>
+      <Filter>Engine\Client_h</Filter>
     </ClInclude>
     <ClInclude Include="NetworkManager.h">
-      <Filter>NetCore_h</Filter>
-    </ClInclude>
-    <ClInclude Include="ApplicationLevelTest.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="PacketManager.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="Packet.h">
-      <Filter>NetCore_h</Filter>
+      <Filter>Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
-      <Filter>Core_h</Filter>
+      <Filter>Engine\Core_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TCPSocket.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="SocketAddress.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SocketUtil.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="CriticalSection.cpp">
-      <Filter>Core</Filter>
+      <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="MemoryStream.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="ClientManager.cpp">
-      <Filter>Client</Filter>
+      <Filter>Engine\Client</Filter>
     </ClCompile>
     <ClCompile Include="ClientInfo.cpp">
-      <Filter>Client</Filter>
+      <Filter>Engine\Client</Filter>
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
-      <Filter>NetCore</Filter>
-    </ClCompile>
-    <ClCompile Include="ApplicationLevelTest.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="PacketManager.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="Packet.cpp">
-      <Filter>NetCore</Filter>
+      <Filter>Engine\NetCore</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

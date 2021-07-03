@@ -1,9 +1,8 @@
 #pragma once
 
-// 싱글톤으로 수정하기
 class PacketManager
 {
-	friend class ICOPNetworkManager;
+	friend class IOCPNetworkManager;
 public:
 	static std::unique_ptr<PacketManager> sInstance;
 	using psize_t = unsigned __int32;
@@ -23,11 +22,13 @@ public:
 
 private:
 	// 풀링한 패킷이 사라지지 않도록 hold 할 보관 컨테이너임...
+	std::list<AcceptPacketPtr> m_acceptpacket_container;
 	std::list<RecvPacketPtr> m_recvpacket_container;
 	std::list<SendPacketPtr> m_sendpacket_container;
-public:
+
 	// iocp를 위한 스트림 풀링
 	// 일반 동기화의 경우 소켓당 한개씩만 매칭 시킬 것
+	std::queue<AcceptPacketPtr> m_acceptpacket_pool;
 	std::queue<RecvPacketPtr> m_recvpacket_pool;
 	std::queue<SendPacketPtr> m_sendpacket_pool;
 	
@@ -36,6 +37,8 @@ private:
 	unsigned __int32 m_curRecvPacketID;		// 최근에 받은 recv packet id
 	unsigned __int32 m_newSendPacketID;		// 새로 만들 send packet id
 public:
+	AcceptPacketPtr GetAcceptPacketFromPool();
+	void RetrieveAcceptPacket(AcceptPacketPtr inpPacket);
 	RecvPacketPtr GetRecvPacketFromPool();
 	void RetrieveRecvPacket(RecvPacketPtr inpPacket);
 	SendPacketPtr GetSendPacketFromPool();

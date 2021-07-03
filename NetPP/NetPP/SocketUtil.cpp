@@ -51,7 +51,7 @@ TCPSocketPtr SocketUtil::CreateTCPSocket()
 }
 
 // 
-HandlePtr SocketUtil::CreateIOCP(LPTHREAD_START_ROUTINE inWorkThreadPtr)
+HandlePtr SocketUtil::CreateIOCP(LPTHREAD_START_ROUTINE inWorkThreadPtr, std::vector<HandlePtr>& outWorkerThreads)
 {
 	HandlePtr hcpPtr;
 	hcpPtr = std::make_shared<HANDLE>(
@@ -68,6 +68,7 @@ HandlePtr SocketUtil::CreateIOCP(LPTHREAD_START_ROUTINE inWorkThreadPtr)
 		hThread = CreateThread(NULL, 0, inWorkThreadPtr, *hcpPtr, 0, NULL);
 		if (hThread == NULL)
 			return nullptr;
+		outWorkerThreads.push_back(std::make_shared<HANDLE>(hThread));
 		CloseHandle(hThread);
 	}
 
@@ -78,9 +79,9 @@ HandlePtr SocketUtil::LinkIOCPThread(ClientInfoPtr inInfo)
 {
 	return std::make_shared<HANDLE>(
 		CreateIoCompletionPort((HANDLE)inInfo->GetSockPtr()->GetSock(),
-		*ICOPNetworkManager::sInstance->GetHCPPtr(),
-		inInfo->GetID(),
-		0));	
+			*IOCPNetworkManager::sInstance->GetHCPPtr(),
+			inInfo->GetID(),
+			0));
 }
 
 int SocketUtil::Select(

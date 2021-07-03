@@ -60,7 +60,7 @@ RecvPacket::time_point_t RecvPacket::GetRecvTime() const
 	return m_recv_time;
 }
 
-void RecvPacket::Init(RecvPacketPtr inpThis)
+void RecvPacket::Init(PacketBasePtr inpThis)
 {
 	m_overlappedEx.pPacket = inpThis;
 }
@@ -115,9 +115,9 @@ void SendPacket::GetReady(const id_t inPacketID)
 	m_wsabuf.len = m_target_sendbytes - m_sendbytes;
 }
 
-void SendPacket::Init(SendPacketPtr inpThis)
+void SendPacket::Init(PacketBasePtr inpThis)
 {
-	m_overlappedEx.pPacket = inpThis;
+	m_overlappedEx.Init(inpThis);
 }
 
 void SendPacket::Clear()
@@ -125,6 +125,16 @@ void SendPacket::Clear()
 	m_state = E_PacketState::Idle;
 	m_sendbytes = 0;
 	m_target_sendbytes = 0;
+}
+
+void AcceptPacket::Init(PacketBasePtr inpPacket)
+{
+	m_overlappedEx.Init(inpPacket);
+}
+
+void AcceptPacket::GetReady()
+{
+	// ... ¾øÀ½
 }
 
 TCPSocketPtr AcceptPacket::GetPSock()

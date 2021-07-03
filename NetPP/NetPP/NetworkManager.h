@@ -16,17 +16,17 @@ public:
 	TCPSocketPtr GetListenSockPtr() const;
 };
 
-class ICOPNetworkManager : public NetworkManager
+class IOCPNetworkManager : public NetworkManager
 {
 public:
-	static std::unique_ptr<ICOPNetworkManager> sInstance;
+	static std::unique_ptr<IOCPNetworkManager> sInstance;
 
 	using psize_t = PacketManager::psize_t;
 	using InitializeCallBack = bool(*)(void);
-	using CompleteAcceptCallBack = bool (*)(void);
+	using CompleteAcceptCallBack = bool (*)(TCPSocketPtr,SocketAddress);
 	using CompleteRecvCallBack = bool (*)(InputMemoryStreamPtr);
 	using CompleteSendCallBack = bool (*)(OutputMemoryStreamPtr);
-	using DisconnectedCallBack = void (*)(void);
+	using DisconnectedCallBack = void (*)(ClientInfoPtr);
 public:
 	// Init 완료 시 
 	// 여기서 하위 매니저를 초기화합니다
@@ -41,18 +41,18 @@ public:
 	DisconnectedCallBack OnDisconnected;
 protected:
 	HandlePtr	 m_pHcp;
-	std::vector<HANDLE> m_hAcceptThreads;
-	std::vector<HANDLE> m_hWorkerThreads;
+	std::vector<HandlePtr> m_hAcceptThreads;
+	std::vector<HandlePtr> m_hWorkerThreads;	
 	std::queue <std::pair<TCPSocketPtr, SendPacketPtr>> m_sendQueue;
 protected:
-	ICOPNetworkManager()
+	IOCPNetworkManager()
 		:OnInit(), OnCompleteAccept(), OnCompleteRecv(), OnCompleteSend(), OnDisconnected() {}
 	bool Init(u_short inPort, bool isInNonBlock) override;
 public:
 	static bool StaticInit(u_short inPort);
-	ICOPNetworkManager(const ICOPNetworkManager&) = delete;
-	ICOPNetworkManager& operator=(const ICOPNetworkManager&) = delete;
-	~ICOPNetworkManager();
+	IOCPNetworkManager(const IOCPNetworkManager&) = delete;
+	IOCPNetworkManager& operator=(const IOCPNetworkManager&) = delete;
+	~IOCPNetworkManager();
 public:
 	virtual bool DoFrame();
 	HandlePtr GetHCPPtr() const;
@@ -60,6 +60,7 @@ public:
 	bool PushSendQueue(TCPSocketPtr inpSock, SendPacketPtr inpSendPacket);		// sendqueue에등록
 	bool SendQueueProcess();		// send queue에 있는 패킷 처리
 
+	static DWORD WINAPI AcceptThread(LPVOID arg);
 	static bool RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& outRecvPacket);	// 비동기 recv
 	static bool SendAsync(const TCPSocketPtr inpSock, SendPacketPtr inSendPacket);	// 비동기 send	
 	static E_PacketState CompleteRecv(TCPSocketPtr inpSock, RecvPacketPtr& outpPacket, const psize_t inCompletebyte);
