@@ -6,6 +6,7 @@
 // ps :: weak ptr -> std::enable_shared_from_this<> 를 상속하여 shared 로 구현 가능하지만 vtable 이 생길텐데...
 // shared 사용시 위에 class 상속 받으면 this 참조 스마트 포인터라도 정상적으로 동작함
 // 일단 enable_shared_from_this 는 virtual 없어보임
+//--> 기본 overlapped 에 PVOID 있음
 struct OverlappedEx // : std::enable_shared_from_this<OverlappedEx> 
 {
 	WSAOVERLAPPED overlapped;

@@ -1,6 +1,5 @@
 #include "base.h"
 
-
 sockaddr_in& SocketAddress::GetSockAddr()
 {
 	return m_sockaddr;

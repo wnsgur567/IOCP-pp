@@ -13,28 +13,37 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Engine">
+    <Filter Include="01_Engine">
       <UniqueIdentifier>{1bbe6d83-5835-423a-9643-f5d27b15ecda}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\NetCore_h">
+    <Filter Include="01_Engine\NetCore_h">
       <UniqueIdentifier>{8922028c-849e-4b8e-8415-70fcd54a9db9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Client">
+    <Filter Include="01_Engine\Client">
       <UniqueIdentifier>{71191999-eacd-43e1-bccc-7760279e19a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Client_h">
+    <Filter Include="01_Engine\Client_h">
       <UniqueIdentifier>{b1f18ff7-3ac1-4054-816e-9209936de36c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Core">
-      <UniqueIdentifier>{370d0d90-8c48-49b3-b48f-588852f31d5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Core_h">
-      <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\NetCore">
+    <Filter Include="01_Engine\NetCore">
       <UniqueIdentifier>{aa8d8d78-e4dc-4f77-ae1a-14141bdcf18f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Application">
+    <Filter Include="00_Core">
+      <UniqueIdentifier>{370d0d90-8c48-49b3-b48f-588852f31d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00_Core_h">
+      <UniqueIdentifier>{9c30a6e7-da25-46ad-8a74-224e9e3a4046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02_MainProcess">
+      <UniqueIdentifier>{b458e117-22cc-421a-85d3-9d86c2e73e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02_MainProcess\Sign">
+      <UniqueIdentifier>{89d5178d-c47a-4fa3-81ea-60478e7958c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02_MainProcess\Sign_h">
+      <UniqueIdentifier>{4db9b55a-d363-46d6-b97a-a2c48e38515a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03_Application">
       <UniqueIdentifier>{25828cb8-bd53-494c-a914-b97406aeec67}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -43,78 +52,111 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="TCPSocket.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketAddress.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="SocketUtil.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="CriticalSection.h">
-      <Filter>Engine\Core_h</Filter>
+      <Filter>00_Core_h</Filter>
     </ClInclude>
     <ClInclude Include="MemoryStream.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="ClientInfo.h">
-      <Filter>Engine\Client_h</Filter>
+      <Filter>01_Engine\Client_h</Filter>
     </ClInclude>
     <ClInclude Include="ClientManager.h">
-      <Filter>Engine\Client_h</Filter>
+      <Filter>01_Engine\Client_h</Filter>
     </ClInclude>
     <ClInclude Include="NetworkManager.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="PacketManager.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="Packet.h">
-      <Filter>Engine\NetCore_h</Filter>
+      <Filter>01_Engine\NetCore_h</Filter>
     </ClInclude>
     <ClInclude Include="Singleton.h">
-      <Filter>Engine\Core_h</Filter>
+      <Filter>00_Core_h</Filter>
     </ClInclude>
     <ClInclude Include="Session.h">
-      <Filter>Engine</Filter>
+      <Filter>01_Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SignManager.h">
+      <Filter>02_MainProcess\Sign_h</Filter>
+    </ClInclude>
+    <ClInclude Include="SignInfo.h">
+      <Filter>02_MainProcess\Sign_h</Filter>
+    </ClInclude>
+    <ClInclude Include="base_Engine.h">
+      <Filter>01_Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="base_application.h">
+      <Filter>02_MainProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="SignTesting.h">
+      <Filter>03_Application</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseManager.h">
+      <Filter>02_MainProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerRegistry.h">
+      <Filter>02_MainProcess</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TCPSocket.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="SocketAddress.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="SocketUtil.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="CriticalSection.cpp">
-      <Filter>Engine\Core</Filter>
+      <Filter>00_Core</Filter>
     </ClCompile>
     <ClCompile Include="MemoryStream.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="ClientManager.cpp">
-      <Filter>Engine\Client</Filter>
+      <Filter>01_Engine\Client</Filter>
     </ClCompile>
     <ClCompile Include="ClientInfo.cpp">
-      <Filter>Engine\Client</Filter>
+      <Filter>01_Engine\Client</Filter>
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="PacketManager.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="Packet.cpp">
-      <Filter>Engine\NetCore</Filter>
+      <Filter>01_Engine\NetCore</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
-      <Filter>Engine</Filter>
+      <Filter>01_Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="SignInfo.cpp">
+      <Filter>02_MainProcess\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="SignManager.cpp">
+      <Filter>02_MainProcess\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="SignTesting.cpp">
+      <Filter>03_Application</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseManager.cpp">
+      <Filter>02_MainProcess</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

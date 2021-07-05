@@ -56,6 +56,9 @@ public:
 public:
 	bool MainLoop() override;
 
+	void Recv(HANDLE hEvent);
+	void Send();
+public:
 	// call back ±¸Çö
 	static bool OnAccept(TCPSocketPtr, SocketAddress);
 	static bool OnCompleteRecv(InputMemoryStreamPtr);

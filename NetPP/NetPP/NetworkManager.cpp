@@ -84,7 +84,7 @@ IOCPNetworkManager::~IOCPNetworkManager()
 }
 
 bool IOCPNetworkManager::DoFrame()
-{	
+{
 	// send process
 	if (!SendQueueProcess())
 		return false;
@@ -170,10 +170,10 @@ bool IOCPNetworkManager::RecvAsync(const TCPSocketPtr inpSock, RecvPacketPtr& ou
 		}
 	}
 
-	if (outRecvPacket != nullptr)
-	{
-		outRecvPacket = pPacket;
+	/*if (outRecvPacket != nullptr)
 	}
+	{*/
+	outRecvPacket = pPacket;
 
 	return true;
 }
@@ -233,6 +233,7 @@ E_PacketState IOCPNetworkManager::CompleteRecv(TCPSocketPtr inpSock, RecvPacketP
 		}
 		return E_PacketState::InComplete;
 	}
+
 	return E_PacketState::Completed;
 }
 
@@ -329,9 +330,8 @@ DWORD __stdcall IOCPNetworkManager::WorkerThread(LPVOID arg)
 			}
 
 			// complete recv process
-			IOCPNetworkManager::sInstance->OnCompleteRecv(nullptr);
+			IOCPNetworkManager::sInstance->OnCompleteRecv(pRecvPacket->GetStream());
 
-			// TODO : Retrieve packet
 			PacketManager::sInstance->RetrieveRecvPacket(pRecvPacket);
 
 			// recv 날려놓기

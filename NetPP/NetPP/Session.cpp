@@ -64,25 +64,36 @@ bool IOCPSession::MainLoop()
 
 bool IOCPSession::OnAccept(TCPSocketPtr inpClientSock, SocketAddress inAddr)
 {
+	printf("...OnAccept()");
+
 	AutoLocker locker(&IOCPSession::sInstance->m_cs);
-	
+
 	ClientInfoPtr newClient = std::make_shared<ClientInfo>(inpClientSock, inAddr);
 	ClientManager::sInstance->RegistNewClient(newClient);
 	SocketUtil::LinkIOCPThread(newClient);
+
+	RecvPacketPtr pOutPacket;
+	if (false == IOCPNetworkManager::RecvAsync(inpClientSock, pOutPacket))
+	{
+		// ...
+	}
 
 	return true;
 }
 
 bool IOCPSession::OnCompleteRecv(InputMemoryStreamPtr)
 {
+	printf("...OnCompleteRecv()");
 	return true;
 }
 
 bool IOCPSession::OnCompleteSend(OutputMemoryStreamPtr)
 {
+	printf("...OnCompleteSend()");
 	return true;
 }
 
 void IOCPSession::OnDisconnected(ClientInfoPtr)
 {
+	printf("...OnDisconnected");
 }

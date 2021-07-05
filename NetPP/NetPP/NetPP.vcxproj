@@ -140,14 +140,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="base.h" />
+    <ClInclude Include="base_application.h" />
+    <ClInclude Include="base_Engine.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="ClientManager.h" />
     <ClInclude Include="CriticalSection.h" />
+    <ClInclude Include="ManagerRegistry.h" />
     <ClInclude Include="MemoryStream.h" />
     <ClInclude Include="NetworkManager.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketManager.h" />
+    <ClInclude Include="BaseManager.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="SignInfo.h" />
+    <ClInclude Include="SignManager.h" />
+    <ClInclude Include="SignTesting.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="SocketAddress.h" />
     <ClInclude Include="SocketUtil.h" />
@@ -162,7 +169,11 @@
     <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketManager.cpp" />
+    <ClCompile Include="BaseManager.cpp" />
     <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SignInfo.cpp" />
+    <ClCompile Include="SignManager.cpp" />
+    <ClCompile Include="SignTesting.cpp" />
     <ClCompile Include="SocketAddress.cpp" />
     <ClCompile Include="SocketUtil.cpp" />
     <ClCompile Include="TCPSocket.cpp" />

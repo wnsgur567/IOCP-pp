@@ -1,6 +1,5 @@
 #include "base.h"
 
-
 #pragma region Recv (InputStream)
 
 InputMemoryStream::InputMemoryStream(size_t inByteCount)
