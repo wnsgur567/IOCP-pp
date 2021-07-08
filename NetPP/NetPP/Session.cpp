@@ -62,6 +62,14 @@ bool IOCPSession::MainLoop()
 	return true;
 }
 
+void IOCPSession::Recv(HANDLE hEvent)
+{
+}
+
+void IOCPSession::Send()
+{
+}
+
 bool IOCPSession::OnAccept(TCPSocketPtr inpClientSock, SocketAddress inAddr)
 {
 	printf("...OnAccept()");

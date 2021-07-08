@@ -4,8 +4,8 @@ std::unique_ptr<SignManager> Singleton<SignManager>::sInstance;
 
 bool SignManager::StaticInitialize()
 {
-	sInstance.reset(new SignManager);
-	return false;
+	sInstance.reset(new SignManager());
+	return true;
 }
 
 bool SignManager::Initialize()
@@ -46,6 +46,11 @@ void SignManager::OnRecved(ClientInfoPtr inpInfo, InputMemoryStreamPtr inpStream
 	BaseManager::OnRecved(inpInfo, inpStream);
 
 	// ...	
+}
+
+bool SignManager::DoFrame()
+{
+	return true;
 }
 
 SignManager::ResultInfo SignManager::SignUpProcess(const SignInfo inInfo)

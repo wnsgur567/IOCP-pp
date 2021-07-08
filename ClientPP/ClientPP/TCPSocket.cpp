@@ -45,7 +45,7 @@ bool TCPSocket::Listen(int inClients)
 TCPSocketPtr TCPSocket::Accept(SocketAddress& outFromAddress)
 {
 	socklen_t len = sizeof(sockaddr_in);
- 	SOCKET _new_sock = accept(m_socket, (sockaddr*)&(outFromAddress.GetSockAddr()), &len);
+	SOCKET _new_sock = accept(m_socket, (sockaddr*)&(outFromAddress.GetSockAddr()), &len);
 
 	if (EWOULDBLOCK == _new_sock)
 	{

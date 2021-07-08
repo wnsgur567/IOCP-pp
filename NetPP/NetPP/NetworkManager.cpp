@@ -2,7 +2,7 @@
 
 std::unique_ptr<IOCPNetworkManager> IOCPNetworkManager::sInstance;
 
-bool NetworkManager::Init(u_short inPort, bool isInNonBlock)
+bool NetworkManagerServer::Init(u_short inPort, bool isInNonBlock)
 {
 	// listen 소켓 생성
 	m_pListenSock = SocketUtil::CreateTCPSocket();
@@ -10,10 +10,9 @@ bool NetworkManager::Init(u_short inPort, bool isInNonBlock)
 	{
 		return false;
 	}
-
-	// listen sock를 논블록으로
-	if (false == m_pListenSock->SetNonBlockingMode(isInNonBlock))
-		return false;
+		
+	/*if (false == m_pListenSock->SetNonBlockingMode(isInNonBlock))
+		return false;*/
 
 	// binding
 	SocketAddress myAddress(htonl(INADDR_ANY), htons(inPort));
@@ -30,13 +29,13 @@ bool NetworkManager::Init(u_short inPort, bool isInNonBlock)
 	return true;
 }
 
-NetworkManager::~NetworkManager()
+NetworkManagerServer::~NetworkManagerServer()
 {
 	SocketUtil::CleanUp();
 }
 
 
-TCPSocketPtr NetworkManager::GetListenSockPtr() const
+TCPSocketPtr NetworkManagerServer::GetListenSockPtr() const
 {
 	return m_pListenSock;
 }
@@ -52,7 +51,7 @@ bool IOCPNetworkManager::Init(u_short inPort, bool isInNonBlock = false)
 		return false;
 
 	// parent init
-	if (false == NetworkManager::Init(inPort, isInNonBlock))
+	if (false == NetworkManagerServer::Init(inPort, isInNonBlock))
 		return false;
 
 	// create accept thread
@@ -126,8 +125,9 @@ DWORD __stdcall IOCPNetworkManager::AcceptThread(LPVOID arg)
 	while (true)
 	{
 		// accept
-		TCPSocketPtr pClientSock = listen_sock->Accept(addr);
+ 		TCPSocketPtr pClientSock = listen_sock->Accept(addr);
 
+		if(pClientSock != nullptr)
 		{// lock
 			AutoLocker locker(IOCPSession::sInstance->GetCSPtr());
 
@@ -135,7 +135,7 @@ DWORD __stdcall IOCPNetworkManager::AcceptThread(LPVOID arg)
 			AcceptPacketPtr pAcceptPacket = PacketManager::sInstance->GetAcceptPacketFromPool();
 			PostQueuedCompletionStatus(
 				*IOCPNetworkManager::sInstance->m_pHcp,
-				0,
+				1,
 				(ULONG_PTR)&pAcceptPacket,
 				&pAcceptPacket->m_overlappedEx.overlapped);
 		}// lock end
@@ -283,14 +283,14 @@ DWORD __stdcall IOCPNetworkManager::WorkerThread(LPVOID arg)
 			client_info->SetState(E_ClientState::Disconnected);
 		}
 
-		if (client_info->GetState() == E_ClientState::Disconnected)
+		if (overlapped->type != E_OverlappedType::Accept &&
+			client_info->GetState() == E_ClientState::Disconnected)
 		{
 			//RemoveClientInfo(ptr);
 			// callback
 			IOCPNetworkManager::sInstance->OnDisconnected(client_info);
 			continue;
 		}
-
 
 		E_PacketState result;
 

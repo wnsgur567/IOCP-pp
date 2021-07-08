@@ -1,22 +1,23 @@
 #pragma once
-class NetworkManager
+
+class NetworkManagerServer
 {
 protected:
 	TCPSocketPtr m_pListenSock;
 protected:
-	NetworkManager() {}
+	NetworkManagerServer() {}
 	virtual bool Init(u_short inPort, bool isInNonBlock);
 public:
-	NetworkManager(const NetworkManager&) = delete;
-	NetworkManager& operator=(const NetworkManager&) = delete;
-	virtual ~NetworkManager();
+	NetworkManagerServer(const NetworkManagerServer&) = delete;
+	NetworkManagerServer& operator=(const NetworkManagerServer&) = delete;
+	virtual ~NetworkManagerServer();
 public:
 	virtual bool DoFrame() = 0;
 
 	TCPSocketPtr GetListenSockPtr() const;
 };
 
-class IOCPNetworkManager : public NetworkManager
+class IOCPNetworkManager : public NetworkManagerServer
 {
 public:
 	static std::unique_ptr<IOCPNetworkManager> sInstance;
@@ -68,7 +69,7 @@ public:
 	static DWORD WINAPI WorkerThread(LPVOID arg);
 };
 
-class SelectNetworkManager : public NetworkManager
+class SelectNetworkManager : public NetworkManagerServer
 {
 
 };
